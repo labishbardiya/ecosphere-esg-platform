@@ -1,63 +1,181 @@
-# ecosphere-esg-platform 🌍
+# EcoSphere — Enterprise ESG Management Platform
 
-## 📌 Overview
-Environmental, Social, and Governance (ESG) tracking has become a critical aspect of modern businesses. While traditional ERP systems collect operational data, ESG reporting is often manual and disconnected. 
+**EcoSphere** integrates Environmental, Social, and Governance (ESG) tracking into day-to-day operations: carbon accounting, CSR participation, compliance, and employee gamification — with live department scores and executive reporting.
 
-**EcoSphere** is a centralized platform built to integrate ESG directly into day-to-day ERP operations. It measures sustainability metrics, encourages employee participation through gamification, and provides management with real-time, actionable reports.
-
----
-
-## 🚀 Core Modules
-
-The platform is structured into four primary modules following a clean MVC architecture:
-
-*   **🌱 Environmental:** Handles carbon accounting, emission factors, sustainability goals, and automated carbon reports.
-*   **🤝 Social:** Manages CSR (Corporate Social Responsibility) activities, employee participation tracking, diversity metrics, and engagement.
-*   **⚖️ Governance:** Tracks company policies, governance audits, compliance issues, and governance reporting.
-*   **🎮 Gamification:** Drives user engagement through sustainability challenges, XP (Experience Points), unlockable badges, rewards, and leaderboards.
+| | |
+|--|--|
+| **Stack** | Next.js 16 · TypeScript · Tailwind v4 · shadcn/ui · Better Auth · Drizzle · Neon Postgres |
+| **Repo** | https://github.com/labishbardiya/ecosphere-esg-platform |
+| **Production** | https://ecosphere-esg-platform-roan.vercel.app |
 
 ---
 
-## 📊 Business Intelligence & Scoring
+## Core modules
 
-The application aggregates departmental ESG performance to provide an overall organizational snapshot. 
-
-The **Overall ESG Score** is a weighted average of the Department Total Scores. By default, the calculation is configured as:
-
-$$Overall\ ESG=(0.4\times Environmental)+(0.3\times Social)+(0.3\times Governance)$$
-
-*Note: The weighting distribution is configurable per organization via the settings module.*
-
----
-
-## 🗄️ Data Model Overview
-
-The system strictly divides data into Master Configuration and Transactional Data to ensure data integrity.
-
-### Master Data
-*   **Departments:** Defines the organizational hierarchy and ESG ownership.
-*   **Categories:** Shared values for CSR Activities and Challenges.
-*   **Emission Factors:** Standardized values used for calculating carbon output.
-*   **Gamification Assets:** Badges (with unlock rules) and Rewards (with point requirements and stock limits).
-
-### Transactional Data
-*   **Carbon Transactions:** Automated emission calculations stemming from ERP operations.
-*   **Employee Participation:** Tracking involvement in CSR Activities and Challenges, requiring proof and approval workflows.
-*   **Compliance Issues:** Governance violations logged with an assigned owner, severity, and due date.
+| Module | What it does |
+|--------|----------------|
+| **Dashboard** | Mission control: ESG scores, KPIs, insights, rankings, deadlines, activity feed |
+| **Environmental** | Emission factors, carbon ledger (auto CO₂e), resources, waste, goals, charts |
+| **Social** | CSR activities, join + proof, manager approve/reject → points |
+| **Governance** | Policies + acknowledgements, audits, compliance issues (owner + due date) |
+| **Gamification** | Challenges, XP/points, auto badges, rewards, leaderboard |
+| **Reports** | E / S / G / summary + CSV export (admin) |
+| **Settings** | ESG weights, feature toggles, departments, categories (admin) |
 
 ---
 
-## ⚙️ Key Business Rules & Workflows
+## ESG scoring
 
-1.  **Automated Emissions:** When enabled, carbon transactions are calculated automatically from linked operational records (Purchasing, Manufacturing, Fleet) using the relevant Emission Factors.
-2.  **Evidence-Based Approvals:** CSR Activity participation requires attached proof files before it can be marked as "Approved".
-3.  **Dynamic Gamification:** Badges are auto-awarded the moment an employee's XP or completed challenge count satisfies the specific unlock rule[cite: 2]. Employees can redeem their earned points for rewards from the catalog.
-4.  **Compliance Accountability:** Every compliance issue must have an assigned Owner and a Due Date. The platform's notification engine flags issues that remain open past their deadline.
+Default weights (configurable in **Settings**):
+
+```
+Overall ESG = 0.4 × Environmental + 0.3 × Social + 0.3 × Governance
+```
+
+Scores are computed from live operational data (carbon, CSR approvals, policy acks, open/overdue issues), not hardcoded UI values.
 
 ---
 
-## 🛠️ Installation & Setup
+## Architecture
 
-1. Clone the repository:
-   ```bash
-   git clone [https://github.com/manishprasad9156/ecosphere-esg-platform.git](https://github.com/manishprasad9156/ecosphere-esg-platform.git)
+```
+Browser (UI)
+    ↓
+Next.js App Router (Server Actions + Better Auth API routes)
+    ↓
+Drizzle ORM
+    ↓
+PostgreSQL (Neon)
+```
+
+- **Frontend + backend** for the product live in this Next.js app.
+- The optional `backend/` Python (FastAPI) folder is **not** wired into the UI; do not treat it as the production API.
+
+Soft real-time: authenticated layout refreshes about every **8 seconds** so admin views (e.g. leaderboard) pick up employee actions.
+
+---
+
+## Tech requirements
+
+- Node.js 20+
+- npm (or pnpm)
+- PostgreSQL (local Docker **or** Neon)
+
+---
+
+## Setup (local)
+
+```bash
+git clone https://github.com/labishbardiya/ecosphere-esg-platform.git
+cd ecosphere-esg-platform
+npm install
+```
+
+Create `.env.local`:
+
+```bash
+DATABASE_URL=postgresql://USER:PASSWORD@HOST/DB?sslmode=require
+BETTER_AUTH_URL=http://localhost:3000
+BETTER_AUTH_SECRET=generate-a-long-random-string
+```
+
+Apply schema (if tables are missing), then start:
+
+```bash
+# Optional: apply Phase 3+ SQL against your DB
+# psql "$DATABASE_URL" -f scripts/migrate-phase3.sql
+
+npm run dev
+```
+
+Open http://localhost:3000
+
+### Local Postgres via Docker (optional)
+
+```bash
+docker run -d --name ecosphere-pg \
+  -e POSTGRES_USER=ecosphere \
+  -e POSTGRES_PASSWORD=ecosphere \
+  -e POSTGRES_DB=ecosphere \
+  -p 5433:5432 \
+  postgres:16-alpine
+
+# DATABASE_URL=postgresql://ecosphere:ecosphere@127.0.0.1:5433/ecosphere
+```
+
+---
+
+## Demo accounts
+
+After seeding (or creating users via sign-up), use:
+
+| Role | Email | Password |
+|------|--------|----------|
+| **Admin** | `admin@ecosphere.demo` | `password123` |
+| **Employee** | `employee1@ecosphere.demo` | `password123` |
+| **Employee** | `employee2@ecosphere.demo` | `password123` |
+
+Alternate admin (if present): `verify@ecosphere.local` / `password123`
+
+**First user** registered on an empty DB becomes **admin** automatically.
+
+---
+
+## Key business rules
+
+1. **Carbon auto-calc** — total CO₂e = quantity × emission factor (factor snapshotted on the transaction).
+2. **CSR evidence** — when enabled, approval requires a proof URL/file reference.
+3. **Badge auto-award** — when XP / completed-challenge thresholds are met.
+4. **Reward redeem** — deducts points and stock atomically.
+5. **Compliance** — every issue needs an **owner** and **due date**; overdue items surface on the dashboard.
+6. **ESG weights** — configurable under Settings (admin).
+
+---
+
+## Scripts
+
+| Command | Purpose |
+|---------|---------|
+| `npm run dev` | Development server |
+| `npm run build` | Production build |
+| `npm run start` | Start production server |
+| `npm run lint` | Lint |
+
+SQL helpers live under `scripts/` (e.g. `migrate-phase3.sql`).
+
+---
+
+## Deploy (Vercel)
+
+1. Connect the GitHub repo to Vercel.
+2. Set environment variables (Production):
+
+```bash
+DATABASE_URL=          # Neon pooled connection string
+BETTER_AUTH_URL=       # https://your-deployment.vercel.app
+BETTER_AUTH_SECRET=    # long random secret
+```
+
+3. Deploy. Auth-related routes use `force-dynamic` so they are not statically prerendered.
+
+---
+
+## Project structure (high level)
+
+```
+app/
+  (app)/           # Authenticated shell (dashboard, modules, reports, settings)
+  actions/         # Server actions (domain logic)
+  api/auth/        # Better Auth handler
+  sign-in|sign-up/ # Auth pages
+components/        # UI (auth, environmental, social, governance, layout, …)
+lib/               # auth, db (schema + pool), esg-scoring, session, settings
+public/videos/     # Auth background video
+scripts/           # SQL migrations / notes
+```
+
+---
+
+## License
+
+See [LICENSE](./LICENSE).
