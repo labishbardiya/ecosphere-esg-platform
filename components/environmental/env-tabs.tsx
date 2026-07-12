@@ -18,7 +18,7 @@ export function EnvTabs() {
   return (
     <nav
       aria-label="Environmental sections"
-      className="flex flex-wrap gap-1 border-b border-border"
+      className="flex flex-wrap gap-1 rounded-xl border border-border/80 bg-muted/30 p-1"
     >
       {tabs.map((tab) => {
         const active = pathname === tab.href
@@ -26,11 +26,12 @@ export function EnvTabs() {
           <Link
             key={tab.href}
             href={tab.href}
+            prefetch
             className={cn(
-              "border-b-2 px-3 py-2 text-sm font-medium transition-colors",
+              "rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
               active
-                ? "border-primary text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground",
+                ? "bg-emerald-600 text-white shadow-sm"
+                : "text-muted-foreground hover:bg-background hover:text-foreground",
             )}
           >
             {tab.label}
