@@ -227,3 +227,156 @@ export const environmentalGoals = pgTable("environmental_goals", {
   createdBy: text("createdBy").notNull(),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
 })
+
+// ============================================================
+// Shared master data
+// ============================================================
+
+/** Shared categories for CSR activities and challenges. */
+export const categories = pgTable("categories", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  type: text("type").notNull(), // csr | challenge
+  isActive: boolean("isActive").notNull().default(true),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+})
+
+/** Key/value org configuration (ESG weights, feature toggles). */
+export const orgSettings = pgTable("org_settings", {
+  id: serial("id").primaryKey(),
+  key: text("key").notNull().unique(),
+  value: text("value").notNull(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+})
+
+// ============================================================
+// Module 2: Social (CSR)
+// ============================================================
+
+export const csrActivities = pgTable("csr_activities", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description"),
+  categoryId: integer("categoryId"),
+  location: text("location"),
+  organizerId: text("organizerId"),
+  capacity: integer("capacity"),
+  startDate: timestamp("startDate"),
+  endDate: timestamp("endDate"),
+  pointsReward: integer("pointsReward").notNull().default(20),
+  status: text("status").notNull().default("upcoming"), // upcoming|active|completed|cancelled
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+})
+
+export const csrParticipation = pgTable("csr_participation", {
+  id: serial("id").primaryKey(),
+  activityId: integer("activityId")
+    .notNull()
+    .references(() => csrActivities.id, { onDelete: "cascade" }),
+  userId: text("userId")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  status: text("status").notNull().default("pending"), // pending|approved|rejected
+  proofUrl: text("proofUrl"),
+  pointsEarned: integer("pointsEarned").notNull().default(0),
+  completedAt: timestamp("completedAt"),
+  reviewedBy: text("reviewedBy"),
+  reviewedAt: timestamp("reviewedAt"),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+})
+
+// ============================================================
+// Module 3: Governance
+// ============================================================
+
+export const policies = pgTable("policies", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  version: text("version").notNull().default("1.0"),
+  content: text("content").notNull(),
+  status: text("status").notNull().default("active"), // draft|active|archived
+  publishedAt: timestamp("publishedAt"),
+  createdBy: text("createdBy"),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+})
+
+export const policyAcknowledgements = pgTable("policy_acknowledgements", {
+  id: serial("id").primaryKey(),
+  policyId: integer("policyId")
+    .notNull()
+    .references(() => policies.id, { onDelete: "cascade" }),
+  userId: text("userId")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  status: text("status").notNull().default("pending"), // pending|accepted|rejected
+  acknowledgedAt: timestamp("acknowledgedAt"),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+})
+
+export const audits = pgTable("audits", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description"),
+  departmentId: integer("departmentId"),
+  status: text("status").notNull().default("scheduled"), // scheduled|in_progress|review|completed
+  scheduledDate: date("scheduledDate"),
+  completedDate: date("completedDate"),
+  findings: text("findings"),
+  recommendations: text("recommendations"),
+  createdBy: text("createdBy"),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+})
+
+export const complianceIssues = pgTable("compliance_issues", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description"),
+  auditId: integer("auditId"),
+  severity: text("severity").notNull().default("medium"), // low|medium|high|critical
+  ownerId: text("ownerId").notNull(),
+  departmentId: integer("departmentId"),
+  dueDate: date("dueDate").notNull(),
+  status: text("status").notNull().default("open"), // open|assigned|in_progress|resolved|closed
+  createdBy: text("createdBy"),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  resolvedAt: timestamp("resolvedAt"),
+})
+
+// ============================================================
+// Scoring, notifications
+// ============================================================
+
+export const departmentScores = pgTable("department_scores", {
+  id: serial("id").primaryKey(),
+  departmentId: integer("departmentId").notNull(),
+  periodMonth: date("periodMonth").notNull(),
+  environmentalScore: numeric("environmentalScore", {
+    precision: 6,
+    scale: 2,
+  })
+    .notNull()
+    .default("0"),
+  socialScore: numeric("socialScore", { precision: 6, scale: 2 })
+    .notNull()
+    .default("0"),
+  governanceScore: numeric("governanceScore", { precision: 6, scale: 2 })
+    .notNull()
+    .default("0"),
+  totalScore: numeric("totalScore", { precision: 6, scale: 2 })
+    .notNull()
+    .default("0"),
+  computedAt: timestamp("computedAt").notNull().defaultNow(),
+})
+
+export const notifications = pgTable("notifications", {
+  id: serial("id").primaryKey(),
+  userId: text("userId")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  type: text("type").notNull(),
+  title: text("title").notNull(),
+  body: text("body"),
+  href: text("href"),
+  isRead: boolean("isRead").notNull().default(false),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+})

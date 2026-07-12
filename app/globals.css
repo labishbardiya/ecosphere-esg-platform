@@ -123,3 +123,146 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ---------- Motion system (demo polish) ---------- */
+@layer utilities {
+  .animate-fade-up {
+    animation: fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .animate-fade-in {
+    animation: fade-in 0.45s ease-out both;
+  }
+  .animate-scale-in {
+    animation: scale-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .animate-float {
+    animation: float 7s ease-in-out infinite;
+  }
+  .animate-float-slow {
+    animation: float 11s ease-in-out infinite;
+  }
+  .animate-pulse-soft {
+    animation: pulse-soft 3.5s ease-in-out infinite;
+  }
+  .animate-shimmer {
+    background-size: 200% 100%;
+    animation: shimmer 2.8s linear infinite;
+  }
+  .animate-bar-fill {
+    animation: bar-fill 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+    transform-origin: left center;
+  }
+  .stagger-1 { animation-delay: 0.05s; }
+  .stagger-2 { animation-delay: 0.1s; }
+  .stagger-3 { animation-delay: 0.15s; }
+  .stagger-4 { animation-delay: 0.2s; }
+  .stagger-5 { animation-delay: 0.25s; }
+  .stagger-6 { animation-delay: 0.3s; }
+  .stagger-7 { animation-delay: 0.35s; }
+  .stagger-8 { animation-delay: 0.4s; }
+
+  .card-hover {
+    @apply transition-all duration-300 ease-out;
+  }
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 12px 40px -12px color-mix(in oklab, var(--primary) 25%, transparent),
+      0 0 0 1px color-mix(in oklab, var(--border) 80%, transparent);
+  }
+
+  .mesh-bg {
+    background:
+      radial-gradient(1200px 600px at 10% -10%, color-mix(in oklab, var(--primary) 22%, transparent), transparent 55%),
+      radial-gradient(900px 500px at 90% 0%, color-mix(in oklab, oklch(0.6 0.12 220) 18%, transparent), transparent 50%),
+      radial-gradient(800px 500px at 50% 100%, color-mix(in oklab, oklch(0.7 0.14 80) 12%, transparent), transparent 55%),
+      var(--background);
+  }
+
+  .grid-overlay {
+    background-image:
+      linear-gradient(to right, color-mix(in oklab, var(--foreground) 4%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in oklab, var(--foreground) 4%, transparent) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, black 20%, transparent 75%);
+  }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  50% { transform: translateY(-14px) translateX(6px); }
+}
+@keyframes pulse-soft {
+  0%, 100% { opacity: 0.45; transform: scale(1); }
+  50% { opacity: 0.75; transform: scale(1.04); }
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@keyframes bar-fill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@keyframes orb-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.05); }
+  66% { transform: translate(-20px, 15px) scale(0.97); }
+}
+
+.orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(48px);
+  pointer-events: none;
+  animation: orb-drift 14s ease-in-out infinite;
+}
+.orb-a {
+  width: 28rem;
+  height: 28rem;
+  background: color-mix(in oklab, var(--primary) 35%, transparent);
+  top: -8rem;
+  left: -6rem;
+}
+.orb-b {
+  width: 22rem;
+  height: 22rem;
+  background: color-mix(in oklab, oklch(0.62 0.14 220) 30%, transparent);
+  top: 10%;
+  right: -4rem;
+  animation-delay: -4s;
+}
+.orb-c {
+  width: 18rem;
+  height: 18rem;
+  background: color-mix(in oklab, oklch(0.75 0.12 90) 25%, transparent);
+  bottom: 5%;
+  left: 30%;
+  animation-delay: -8s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-fade-in,
+  .animate-scale-in,
+  .animate-float,
+  .animate-float-slow,
+  .animate-pulse-soft,
+  .animate-shimmer,
+  .animate-bar-fill,
+  .orb {
+    animation: none !important;
+  }
+}

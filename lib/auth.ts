@@ -68,18 +68,26 @@ export const auth = betterAuth({
       },
     },
   },
-  ...(process.env.NODE_ENV === "development"
+  // v0 preview iframes need SameSite=None; Secure. That breaks http://localhost
+  // because browsers reject Secure cookies over plain HTTP. Only apply iframe
+  // cookie policy when running in a v0/Vercel preview runtime.
+  ...(process.env.V0_RUNTIME_URL || process.env.VERCEL_URL
     ? {
         advanced: {
-          // In dev (v0 preview iframe), force cross-site cookies so the
-          // session cookie is stored by the browser.
           defaultCookieAttributes: {
             sameSite: "none" as const,
             secure: true,
           },
         },
       }
-    : {}),
+    : {
+        advanced: {
+          defaultCookieAttributes: {
+            sameSite: "lax" as const,
+            secure: false,
+          },
+        },
+      }),
 })
 
 export type SessionUser = {

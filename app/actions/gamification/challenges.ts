@@ -103,7 +103,18 @@ export async function completeChallenge(challengeId: number, proofUrl?: string) 
     })
     .where(eq(user.id, userId))
 
-  return { success: true, xpReward: challenge.xpReward, pointsReward: challenge.pointsReward }
+  // Auto-award badges after XP/challenge completion (Section 8)
+  const { checkAndAwardBadgesForUser } = await import(
+    "@/app/actions/gamification/badges"
+  )
+  const badgesAwarded = await checkAndAwardBadgesForUser(userId)
+
+  return {
+    success: true,
+    xpReward: challenge.xpReward,
+    pointsReward: challenge.pointsReward,
+    badgesAwarded,
+  }
 }
 
 export async function getUserChallengeStatus() {

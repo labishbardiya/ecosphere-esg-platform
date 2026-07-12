@@ -50,7 +50,7 @@ export function ChallengeCard({
   }
 
   return (
-    <Card className={`${past ? "opacity-70" : ""}`}>
+    <Card className={`card-hover animate-fade-up transition-shadow ${past ? "opacity-70" : ""}`}>
       <CardHeader>
         <div className="flex items-start justify-between">
           <Badge
