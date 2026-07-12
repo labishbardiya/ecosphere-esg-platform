@@ -21,18 +21,33 @@ export function KpiScoreCard({
   delayClass?: string
 }) {
   return (
-    <Link href={href} className="block rounded-xl transition-shadow hover:shadow-md">
-      <Card className="h-full shadow-none">
-        <CardHeader className="pb-1.5 pt-4">
-          <CardTitle className="text-xs font-medium text-muted-foreground">
+    <Link
+      href={href}
+      className="group block rounded-xl outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
+    >
+      <Card className="h-full gap-0 border-border/80 py-0 shadow-sm transition-all duration-200 group-hover:border-emerald-200 group-hover:shadow-md">
+        <CardHeader className="px-5 pb-1 pt-4">
+          <CardTitle className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             {label}
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2.5 pb-4">
-          <p className={cn("text-2xl font-semibold tabular-nums tracking-tight", accent)}>
+        <CardContent className="space-y-3 px-5 pb-4">
+          <p
+            className={cn(
+              "text-3xl font-semibold tabular-nums tracking-tight text-foreground",
+              accent,
+            )}
+          >
             <AnimatedNumber value={value} decimals={1} />
           </p>
-          <ProgressBar value={value} barClassName={barClassName} />
+          <ProgressBar
+            value={value}
+            className="h-2 bg-zinc-100"
+            barClassName={cn("bg-emerald-600", barClassName)}
+          />
+          <p className="text-[11px] text-muted-foreground">
+            Click to open module →
+          </p>
         </CardContent>
       </Card>
     </Link>
@@ -56,16 +71,16 @@ export function KpiStatCard({
   valueClassName?: string
 }) {
   return (
-    <Card className="h-full shadow-none">
-      <CardHeader className="pb-1.5 pt-4">
-        <CardTitle className="text-xs font-medium text-muted-foreground">
+    <Card className="h-full gap-0 border-border/80 py-0 shadow-sm">
+      <CardHeader className="px-5 pb-1 pt-4">
+        <CardTitle className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
           {label}
         </CardTitle>
       </CardHeader>
-      <CardContent className="pb-4">
+      <CardContent className="px-5 pb-4">
         <p
           className={cn(
-            "text-2xl font-semibold tabular-nums tracking-tight",
+            "text-3xl font-semibold tabular-nums tracking-tight",
             valueClassName,
           )}
         >
@@ -76,7 +91,9 @@ export function KpiStatCard({
           />
         </p>
         {sub && (
-          <p className="mt-1 text-xs text-muted-foreground leading-snug">{sub}</p>
+          <p className="mt-1.5 text-xs leading-snug text-muted-foreground">
+            {sub}
+          </p>
         )}
       </CardContent>
     </Card>

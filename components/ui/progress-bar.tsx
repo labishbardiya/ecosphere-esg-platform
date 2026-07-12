@@ -17,7 +17,7 @@ export function ProgressBar({
   return (
     <div
       className={cn(
-        "h-2 w-full overflow-hidden rounded-full bg-muted",
+        "h-2 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800",
         className,
       )}
       role="progressbar"
@@ -27,7 +27,7 @@ export function ProgressBar({
     >
       <div
         className={cn(
-          "h-full rounded-full bg-primary animate-bar-fill transition-[width] duration-700 ease-out",
+          "h-full rounded-full bg-emerald-600 transition-[width] duration-500 ease-out",
           barClassName,
         )}
         style={{ width: `${pct}%` }}

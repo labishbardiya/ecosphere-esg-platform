@@ -57,17 +57,16 @@ export default async function HomePage() {
             <Sparkles className="size-3.5" />
             Measure · Engage · Report — audit-ready ESG
           </div>
-          <h1 className="animate-fade-up stagger-2 mx-auto mt-6 max-w-3xl text-4xl font-bold tracking-tight text-foreground text-balance md:text-6xl md:leading-[1.08]">
-            Turn ESG from a{" "}
+          <h1 className="animate-fade-up stagger-2 mx-auto mt-6 max-w-3xl text-4xl font-bold tracking-tight text-foreground text-balance md:text-5xl md:leading-[1.12]">
+            Measure what matters.
+            <br />
             <span className="bg-gradient-to-r from-primary via-emerald-600 to-teal-600 bg-clip-text text-transparent">
-              compliance chore
-            </span>{" "}
-            into workforce engagement
+              Engage every employee in ESG.
+            </span>
           </h1>
           <p className="animate-fade-up stagger-3 mx-auto mt-5 max-w-2xl text-lg text-muted-foreground text-pretty leading-relaxed">
-            Carbon accounting, CSR participation, governance compliance, and
-            gamified employee engagement — one ERP-style platform with live
-            department scores.
+            Carbon, CSR, compliance, and gamified impact — scored live so
+            leadership acts on data, not spreadsheets.
           </p>
           <div className="animate-fade-up stagger-4 mt-8 flex flex-wrap items-center justify-center gap-3">
             <Button size="lg" asChild className="h-11 px-6 shadow-lg shadow-primary/25">
