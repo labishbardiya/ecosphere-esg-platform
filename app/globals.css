@@ -216,6 +216,60 @@
   from { transform: scaleX(0); }
   to { transform: scaleX(1); }
 }
+
+/* Liquid glass auth motion */
+@keyframes liquid-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(18px, -22px) scale(1.06); }
+  66% { transform: translate(-14px, 12px) scale(0.96); }
+}
+@keyframes liquid-pulse {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50% { opacity: 0.65; transform: scale(1.08); }
+}
+@keyframes auth-rise {
+  from { opacity: 0; transform: translateY(28px) scale(0.98); filter: blur(6px); }
+  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+@keyframes bar-shimmer {
+  0% { filter: brightness(1); }
+  50% { filter: brightness(1.25); }
+  100% { filter: brightness(1); }
+}
+
+@layer utilities {
+  .animate-liquid-float {
+    animation: liquid-float 12s ease-in-out infinite;
+  }
+  .animate-liquid-float-delayed {
+    animation: liquid-float 16s ease-in-out infinite reverse;
+    animation-delay: -4s;
+  }
+  .animate-liquid-pulse {
+    animation: liquid-pulse 5s ease-in-out infinite;
+  }
+  .animate-auth-rise {
+    animation: auth-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .animate-auth-rise-delay-1 {
+    animation: auth-rise 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+  }
+  .animate-auth-rise-delay-2 {
+    animation: auth-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both;
+  }
+  .animate-bar-shimmer {
+    animation: bar-shimmer 2.4s ease-in-out infinite;
+  }
+}
+
+/* Auth form glass inputs — fix autofill white flash */
+input.bg-white\/15:-webkit-autofill,
+input.bg-white\/15:-webkit-autofill:hover,
+input.bg-white\/15:-webkit-autofill:focus {
+  -webkit-text-fill-color: #fff;
+  transition: background-color 9999s ease-in-out 0s;
+  box-shadow: 0 0 0px 1000px rgba(255, 255, 255, 0.12) inset;
+}
 @keyframes orb-drift {
   0%, 100% { transform: translate(0, 0) scale(1); }
   33% { transform: translate(30px, -20px) scale(1.05); }

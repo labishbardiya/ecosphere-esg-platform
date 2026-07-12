@@ -1,6 +1,7 @@
 import "server-only"
 
 import { and, eq, ne, sql } from "drizzle-orm"
+import { unstable_cache } from "next/cache"
 import { db } from "@/lib/db"
 import {
   carbonTransactions,
@@ -8,7 +9,6 @@ import {
   csrParticipation,
   departmentScores,
   departments,
-  policies,
   policyAcknowledgements,
   user,
 } from "@/lib/db/schema"
@@ -22,55 +22,79 @@ function periodStart(d = new Date()): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`
 }
 
-/**
- * Deterministic ESG scoring from live operational data.
- */
-export async function computeDepartmentScores(periodMonth?: string) {
-  const period = periodMonth ?? periodStart()
-  const weights = await getEsgWeights()
-  const depts = await db.select().from(departments)
+export type EsgScoreResult = {
+  period: string
+  weights: { environmental: number; social: number; governance: number }
+  departments: Array<{
+    departmentId: number
+    name: string
+    environmentalScore: number
+    socialScore: number
+    governanceScore: number
+    totalScore: number
+  }>
+  organization: {
+    environmental: number
+    social: number
+    governance: number
+    total: number
+  }
+}
 
-  const carbonByDept = await db
-    .select({
-      departmentId: carbonTransactions.departmentId,
-      total: sql<string>`coalesce(sum(${carbonTransactions.totalKgCo2e}::numeric), 0)`,
-    })
-    .from(carbonTransactions)
-    .groupBy(carbonTransactions.departmentId)
+/**
+ * Pure compute — no writes on the hot path.
+ * Pass persist=true only for explicit recompute jobs.
+ */
+export async function computeDepartmentScores(options?: {
+  periodMonth?: string
+  persist?: boolean
+}): Promise<EsgScoreResult> {
+  const period = options?.periodMonth ?? periodStart()
+  const persist = options?.persist ?? false
+  const weights = await getEsgWeights()
+
+  const [depts, carbonByDept, csrRows, policyRows, issueRows] =
+    await Promise.all([
+      db.select().from(departments),
+      db
+        .select({
+          departmentId: carbonTransactions.departmentId,
+          total: sql<string>`coalesce(sum(${carbonTransactions.totalKgCo2e}::numeric), 0)`,
+        })
+        .from(carbonTransactions)
+        .groupBy(carbonTransactions.departmentId),
+      db
+        .select({
+          departmentId: user.departmentId,
+          status: csrParticipation.status,
+          cnt: sql<string>`count(*)`,
+        })
+        .from(csrParticipation)
+        .innerJoin(user, eq(csrParticipation.userId, user.id))
+        .groupBy(user.departmentId, csrParticipation.status),
+      db
+        .select({
+          departmentId: user.departmentId,
+          status: policyAcknowledgements.status,
+          cnt: sql<string>`count(*)`,
+        })
+        .from(policyAcknowledgements)
+        .innerJoin(user, eq(policyAcknowledgements.userId, user.id))
+        .groupBy(user.departmentId, policyAcknowledgements.status),
+      db
+        .select({
+          departmentId: complianceIssues.departmentId,
+          open: sql<string>`count(*) filter (where ${complianceIssues.status} not in ('resolved','closed'))`,
+          overdue: sql<string>`count(*) filter (where ${complianceIssues.status} not in ('resolved','closed') and ${complianceIssues.dueDate}::date < current_date)`,
+        })
+        .from(complianceIssues)
+        .groupBy(complianceIssues.departmentId),
+    ])
 
   const carbonMap = new Map(
     carbonByDept.map((r) => [r.departmentId, Number(r.total)]),
   )
   const maxCarbon = Math.max(1, ...Array.from(carbonMap.values()), 1)
-
-  const csrRows = await db
-    .select({
-      departmentId: user.departmentId,
-      status: csrParticipation.status,
-      cnt: sql<string>`count(*)`,
-    })
-    .from(csrParticipation)
-    .innerJoin(user, eq(csrParticipation.userId, user.id))
-    .groupBy(user.departmentId, csrParticipation.status)
-
-  const policyRows = await db
-    .select({
-      departmentId: user.departmentId,
-      status: policyAcknowledgements.status,
-      cnt: sql<string>`count(*)`,
-    })
-    .from(policyAcknowledgements)
-    .innerJoin(user, eq(policyAcknowledgements.userId, user.id))
-    .groupBy(user.departmentId, policyAcknowledgements.status)
-
-  const issueRows = await db
-    .select({
-      departmentId: complianceIssues.departmentId,
-      open: sql<string>`count(*) filter (where ${complianceIssues.status} not in ('resolved','closed'))`,
-      overdue: sql<string>`count(*) filter (where ${complianceIssues.status} not in ('resolved','closed') and ${complianceIssues.dueDate}::date < current_date)`,
-    })
-    .from(complianceIssues)
-    .groupBy(complianceIssues.departmentId)
 
   function csrForDept(deptId: number) {
     let total = 0
@@ -96,14 +120,7 @@ export async function computeDepartmentScores(periodMonth?: string) {
     return { total, accepted }
   }
 
-  const results: Array<{
-    departmentId: number
-    name: string
-    environmentalScore: number
-    socialScore: number
-    governanceScore: number
-    totalScore: number
-  }> = []
+  const results: EsgScoreResult["departments"] = []
 
   for (const dept of depts) {
     const kg = carbonMap.get(dept.id) ?? 0
@@ -136,38 +153,39 @@ export async function computeDepartmentScores(periodMonth?: string) {
       governanceScore: Number(govScore.toFixed(2)),
       totalScore: Number(totalScore.toFixed(2)),
     })
+  }
 
-    const existing = await db
-      .select()
-      .from(departmentScores)
-      .where(
-        and(
-          eq(departmentScores.departmentId, dept.id),
-          eq(departmentScores.periodMonth, period),
-        ),
-      )
-      .then((r) => r[0])
+  if (persist && results.length > 0) {
+    await Promise.all(
+      results.map(async (row) => {
+        const existing = await db
+          .select({ id: departmentScores.id })
+          .from(departmentScores)
+          .where(eq(departmentScores.departmentId, row.departmentId))
+          .then((r) => r[0])
 
-    const payload = {
-      environmentalScore: envScore.toFixed(2),
-      socialScore: socialScore.toFixed(2),
-      governanceScore: govScore.toFixed(2),
-      totalScore: totalScore.toFixed(2),
-      computedAt: new Date(),
-    }
+        const payload = {
+          environmentalScore: row.environmentalScore.toFixed(2),
+          socialScore: row.socialScore.toFixed(2),
+          governanceScore: row.governanceScore.toFixed(2),
+          totalScore: row.totalScore.toFixed(2),
+          computedAt: new Date(),
+          periodMonth: period,
+        }
 
-    if (existing) {
-      await db
-        .update(departmentScores)
-        .set(payload)
-        .where(eq(departmentScores.id, existing.id))
-    } else {
-      await db.insert(departmentScores).values({
-        departmentId: dept.id,
-        periodMonth: period,
-        ...payload,
-      })
-    }
+        if (existing) {
+          await db
+            .update(departmentScores)
+            .set(payload)
+            .where(eq(departmentScores.id, existing.id))
+        } else {
+          await db.insert(departmentScores).values({
+            departmentId: row.departmentId,
+            ...payload,
+          })
+        }
+      }),
+    )
   }
 
   const avg = (fn: (r: (typeof results)[0]) => number) =>
@@ -190,6 +208,13 @@ export async function computeDepartmentScores(periodMonth?: string) {
   }
 }
 
-export async function getLatestScores() {
-  return computeDepartmentScores()
+/** Short cache so live refresh still picks up new activity quickly. */
+export const getLatestScores = unstable_cache(
+  async () => computeDepartmentScores({ persist: false }),
+  ["esg-scores-v3"],
+  { revalidate: 8, tags: ["esg-scores"] },
+)
+
+export async function recomputeAndPersistScores() {
+  return computeDepartmentScores({ persist: true })
 }

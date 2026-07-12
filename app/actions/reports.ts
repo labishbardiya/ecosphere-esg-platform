@@ -13,7 +13,7 @@ import {
   user,
 } from "@/lib/db/schema"
 import { requireActionUser } from "@/lib/action-auth"
-import { computeDepartmentScores } from "@/lib/esg-scoring"
+import { getLatestScores } from "@/lib/esg-scoring"
 
 export type ReportFilters = {
   departmentId?: number
@@ -144,7 +144,7 @@ export async function getGovernanceReport(filters: ReportFilters = {}) {
 
 export async function getEsgSummaryReport() {
   await requireActionUser()
-  const scores = await computeDepartmentScores()
+  const scores = await getLatestScores()
   const env = await getEnvironmentalReport()
   const social = await getSocialReport()
   const gov = await getGovernanceReport()
