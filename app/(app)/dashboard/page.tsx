@@ -28,7 +28,7 @@ export default async function DashboardPage() {
       icon: Trophy,
       title: "Gamification",
       description: "Challenges, badges and rewards",
-      status: "Coming in Phase 4",
+      status: "Phase 4 — Live",
     },
   ]
 
