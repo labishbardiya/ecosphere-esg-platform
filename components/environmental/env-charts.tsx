@@ -81,7 +81,7 @@ export function EnvCharts({ monthlySeries, bySource, byDepartment }: Props) {
                   nameKey="source"
                   innerRadius={45}
                   outerRadius={80}
-                  label={(entry) => entry.source}
+                  label={(entry) => String(entry.name ?? "")}
                   fontSize={12}
                 >
                   {bySource.map((entry, i) => (

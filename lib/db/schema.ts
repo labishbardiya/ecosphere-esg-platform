@@ -153,6 +153,9 @@ export const rewardRedemptions = pgTable("rewardRedemptions", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   redeemedAt: timestamp("redeemedAt").notNull().defaultNow(),
+})
+
+// ============================================================
 // Module 1: Environmental (GHG Protocol / GRI 302, 303, 305, 306)
 // ============================================================
 
