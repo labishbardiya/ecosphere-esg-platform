@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   db:
@@ -25,7 +24,7 @@ services:
     build: .
     container_name: ecosphere_web
     restart: always
-    command: sh -c "uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    command: sh -c "python wait_for_db.py && alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
     ports:
       - "8000:8000"
     environment:
@@ -46,7 +45,7 @@ services:
     build: .
     container_name: ecosphere_worker
     restart: always
-    command: celery -A app.workers.celery_app worker --loglevel=info
+    command: sh -c "python wait_for_db.py && celery -A app.workers.celery_app worker --loglevel=info"
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/ecosphere_social
       - REDIS_URL=redis://redis:6379/0
@@ -62,7 +61,7 @@ services:
     build: .
     container_name: ecosphere_beat
     restart: always
-    command: celery -A app.workers.celery_app beat --loglevel=info
+    command: sh -c "python wait_for_db.py && celery -A app.workers.celery_app beat --loglevel=info"
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/ecosphere_social
       - REDIS_URL=redis://redis:6379/0
