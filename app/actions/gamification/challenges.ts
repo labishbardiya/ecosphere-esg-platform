@@ -1,5 +1,6 @@
 "use server"
 
+import { revalidatePath } from "next/cache"
 import { db } from "@/lib/db"
 import { challenges, challengeParticipants, user } from "@/lib/db/schema"
 import { getUserId } from "@/lib/session"
@@ -108,6 +109,9 @@ export async function completeChallenge(challengeId: number, proofUrl?: string) 
     "@/app/actions/gamification/badges"
   )
   const badgesAwarded = await checkAndAwardBadgesForUser(userId)
+
+  revalidatePath("/dashboard")
+  revalidatePath("/gamification")
 
   return {
     success: true,

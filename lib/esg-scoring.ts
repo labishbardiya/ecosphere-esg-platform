@@ -208,11 +208,11 @@ export async function computeDepartmentScores(options?: {
   }
 }
 
-/** Cached 45s so module navigation doesn't recompute ESG every click. */
+/** Short cache so live refresh still picks up new activity quickly. */
 export const getLatestScores = unstable_cache(
   async () => computeDepartmentScores({ persist: false }),
-  ["esg-scores-v2"],
-  { revalidate: 45, tags: ["esg-scores"] },
+  ["esg-scores-v3"],
+  { revalidate: 8, tags: ["esg-scores"] },
 )
 
 export async function recomputeAndPersistScores() {

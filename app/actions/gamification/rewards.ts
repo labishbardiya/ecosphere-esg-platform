@@ -1,5 +1,6 @@
 "use server"
 
+import { revalidatePath } from "next/cache"
 import { db } from "@/lib/db"
 import { rewards, rewardRedemptions, user } from "@/lib/db/schema"
 import { getUserId } from "@/lib/session"
@@ -65,6 +66,8 @@ export async function redeemReward(rewardId: number) {
     })
   })
 
+  revalidatePath("/dashboard")
+  revalidatePath("/gamification")
   return { success: true }
 }
 
