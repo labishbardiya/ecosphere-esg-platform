@@ -19,12 +19,6 @@ import { cn } from "@/lib/utils"
 
 type Department = { id: number; name: string }
 
-const glassPanel =
-  "relative overflow-hidden rounded-[1.75rem] border border-white/25 bg-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.35)] backdrop-blur-2xl backdrop-saturate-150"
-
-const glassInput =
-  "h-11 border-white/25 bg-white/15 text-white placeholder:text-white/45 shadow-inner shadow-black/10 backdrop-blur-md focus-visible:border-white/50 focus-visible:ring-white/30 data-[placeholder]:text-white/45 [&_svg]:text-white/70"
-
 export function AuthForm({
   mode,
   departments = [],
@@ -75,10 +69,10 @@ export function AuthForm({
 
   return (
     <main className="relative min-h-svh overflow-hidden bg-zinc-950 text-white">
-      {/* Background video — user Desktop/background.mp4 */}
+      {/* Video — dimmed so UI always reads */}
       <div className="absolute inset-0">
         <video
-          className="h-full w-full scale-105 object-cover opacity-90"
+          className="h-full w-full scale-105 object-cover"
           autoPlay
           muted
           loop
@@ -87,50 +81,45 @@ export function AuthForm({
         >
           <source src="/videos/auth-bg.mp4" type="video/mp4" />
         </video>
-        {/* Transparency layers over video */}
-        <div className="absolute inset-0 bg-zinc-950/45" />
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-950/50 via-transparent to-cyan-950/40" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_20%,rgba(16,185,129,0.22),transparent_55%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_80%,rgba(34,211,238,0.15),transparent_50%)]" />
+        {/* Strong scrims for bright sky video */}
+        <div className="absolute inset-0 bg-zinc-950/70" />
+        <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/90 via-zinc-950/65 to-zinc-950/45" />
+        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-zinc-950/40" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_70%_40%,rgba(16,185,129,0.18),transparent_55%)]" />
       </div>
 
-      {/* Floating liquid orbs */}
       <div
-        className="pointer-events-none absolute -left-20 top-1/4 size-72 rounded-full bg-emerald-400/25 blur-3xl animate-liquid-float"
+        className="pointer-events-none absolute -left-16 top-1/4 size-64 rounded-full bg-emerald-500/20 blur-3xl"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute -right-16 bottom-1/4 size-80 rounded-full bg-cyan-400/20 blur-3xl animate-liquid-float-delayed"
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute left-1/3 top-10 size-40 rounded-full bg-white/10 blur-2xl animate-liquid-pulse"
+        className="pointer-events-none absolute -right-20 bottom-1/4 size-72 rounded-full bg-teal-400/15 blur-3xl"
         aria-hidden
       />
 
       <div className="relative z-10 mx-auto grid min-h-svh max-w-6xl items-center gap-10 px-4 py-10 lg:grid-cols-2 lg:gap-14 lg:px-8">
-        {/* Brand + phone */}
-        <section className="order-2 animate-auth-rise lg:order-1">
+        {/* Left copy */}
+        <section className="order-2 lg:order-1">
           <div className="mb-6 flex items-center gap-3">
-            <div className="flex size-11 items-center justify-center rounded-2xl border border-white/30 bg-white/15 shadow-lg shadow-emerald-500/20 backdrop-blur-xl transition-transform duration-500 hover:scale-105">
+            <div className="flex size-11 items-center justify-center rounded-2xl border border-white/25 bg-white/15 shadow-lg backdrop-blur-xl">
               <Leaf className="size-5 text-emerald-300" aria-hidden />
             </div>
             <div>
-              <p className="text-sm font-semibold tracking-wide text-white">
+              <p className="text-sm font-semibold tracking-wide text-white drop-shadow">
                 EcoSphere
               </p>
-              <p className="text-xs text-white/55">Enterprise ESG Platform</p>
+              <p className="text-xs text-white/70">Enterprise ESG Platform</p>
             </div>
           </div>
 
-          <h1 className="max-w-md text-3xl font-semibold leading-[1.15] tracking-tight text-white md:text-4xl lg:text-[2.6rem]">
+          <h1 className="max-w-md text-3xl font-semibold leading-[1.15] tracking-tight text-white drop-shadow-md md:text-4xl lg:text-[2.65rem]">
             Measure what matters.
             <br />
-            <span className="bg-gradient-to-r from-emerald-200 via-teal-200 to-cyan-200 bg-clip-text text-transparent">
+            <span className="text-emerald-300">
               Engage every employee in ESG.
             </span>
           </h1>
-          <p className="mt-4 max-w-md text-base leading-relaxed text-white/65">
+          <p className="mt-4 max-w-md text-base leading-relaxed text-white/80 drop-shadow">
             Carbon, CSR, compliance, and gamified impact — scored live so
             leadership acts on data, not spreadsheets.
           </p>
@@ -140,15 +129,10 @@ export function AuthForm({
               { icon: TrendingUp, t: "Live ESG scores" },
               { icon: ShieldCheck, t: "Audit-ready trails" },
               { icon: Sparkles, t: "Badges & challenges" },
-            ].map(({ icon: Icon, t }, i) => (
+            ].map(({ icon: Icon, t }) => (
               <li
                 key={t}
-                className={cn(
-                  glassPanel,
-                  "inline-flex items-center gap-1.5 px-3.5 py-2 text-xs text-white/80 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/15",
-                  i === 1 && "animate-auth-rise-delay-1",
-                  i === 2 && "animate-auth-rise-delay-2",
-                )}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-black/30 px-3.5 py-2 text-xs font-medium text-white/90 shadow-sm backdrop-blur-xl"
               >
                 <Icon className="size-3.5 text-emerald-300" />
                 {t}
@@ -156,57 +140,38 @@ export function AuthForm({
             ))}
           </ul>
 
-          {/* Glass phone mockup */}
-          <div className="mt-12 hidden sm:block animate-auth-rise-delay-2">
-            <div className="relative w-[230px]">
-              <div className="absolute -inset-6 rounded-[2.5rem] bg-emerald-400/20 blur-3xl animate-liquid-pulse" />
-              <div
-                className={cn(
-                  glassPanel,
-                  "rounded-[2rem] border-[5px] border-white/20 p-0 transition-transform duration-700 hover:-translate-y-1 hover:rotate-1",
-                )}
-              >
-                <div className="mx-auto mt-2.5 h-1.5 w-14 rounded-full bg-white/25" />
-                <div className="space-y-2.5 p-3 pb-5">
-                  <div className="flex items-center justify-between">
-                    <p className="text-[10px] font-medium text-white/55">
-                      ESG Mission Control
-                    </p>
-                    <span className="rounded-full border border-emerald-300/30 bg-emerald-400/20 px-1.5 py-0.5 text-[9px] font-semibold text-emerald-100">
-                      Live
-                    </span>
+          {/* Compact phone */}
+          <div className="mt-10 hidden sm:block">
+            <div className="relative w-[210px]">
+              <div className="absolute -inset-4 rounded-[2rem] bg-emerald-400/25 blur-2xl" />
+              <div className="relative overflow-hidden rounded-[1.75rem] border border-white/30 bg-zinc-900/70 p-0 shadow-2xl backdrop-blur-2xl">
+                <div className="mx-auto mt-2 h-1.5 w-12 rounded-full bg-white/30" />
+                <div className="space-y-2 p-3 pb-4">
+                  <div className="flex justify-between text-[10px] text-white/60">
+                    <span>ESG Mission Control</span>
+                    <span className="text-emerald-300">Live</span>
                   </div>
-                  <div className="rounded-2xl border border-white/15 bg-gradient-to-br from-emerald-500/40 to-teal-600/50 p-3 backdrop-blur-md">
-                    <p className="text-[10px] text-emerald-50/80">Overall ESG</p>
-                    <p className="text-2xl font-bold tabular-nums text-white">
-                      71.6
-                    </p>
+                  <div className="rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 p-3 text-white">
+                    <p className="text-[10px] text-emerald-50/90">Overall ESG</p>
+                    <p className="text-2xl font-bold">71.6</p>
                     <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-black/25">
-                      <div className="h-full w-[72%] rounded-full bg-white/90 animate-bar-shimmer" />
+                      <div className="h-full w-[72%] rounded-full bg-white" />
                     </div>
                   </div>
-                  <div className="grid grid-cols-3 gap-1.5">
+                  <div className="grid grid-cols-3 gap-1">
                     {[
-                      { l: "Env", v: "72" },
-                      { l: "Social", v: "68" },
-                      { l: "Gov", v: "75" },
-                    ].map((x) => (
+                      ["Env", "72"],
+                      ["Social", "68"],
+                      ["Gov", "75"],
+                    ].map(([l, v]) => (
                       <div
-                        key={x.l}
-                        className="rounded-xl border border-white/10 bg-white/10 px-1.5 py-2 text-center backdrop-blur-sm"
+                        key={l}
+                        className="rounded-lg bg-white/10 py-1.5 text-center"
                       >
-                        <p className="text-[9px] text-white/50">{x.l}</p>
-                        <p className="text-sm font-semibold text-white">{x.v}</p>
+                        <p className="text-[9px] text-white/55">{l}</p>
+                        <p className="text-sm font-semibold text-white">{v}</p>
                       </div>
                     ))}
-                  </div>
-                  <div className="rounded-xl border border-white/10 bg-white/10 p-2 backdrop-blur-sm">
-                    <p className="text-[9px] font-medium text-white/50">
-                      Top insight
-                    </p>
-                    <p className="mt-0.5 text-[10px] leading-snug text-white/85">
-                      Facilities leads ranking. 2 issues overdue.
-                    </p>
                   </div>
                 </div>
               </div>
@@ -214,146 +179,136 @@ export function AuthForm({
           </div>
         </section>
 
-        {/* Liquid glass form */}
-        <section className="order-1 flex justify-center animate-auth-rise-delay-1 lg:order-2 lg:justify-end">
-          <div className={cn(glassPanel, "w-full max-w-[420px] p-7 md:p-8")}>
-            {/* Specular highlight */}
+        {/* Liquid glass form — high contrast */}
+        <section className="order-1 flex justify-center lg:order-2 lg:justify-end">
+          <div
+            className={cn(
+              "relative w-full max-w-[400px] rounded-3xl border border-white/40 p-7 shadow-2xl md:p-8",
+              "bg-zinc-900/55 backdrop-blur-2xl backdrop-saturate-150",
+              "ring-1 ring-inset ring-white/30",
+            )}
+            style={{
+              boxShadow:
+                "0 12px 48px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.35)",
+            }}
+          >
             <div
-              className="pointer-events-none absolute -left-1/4 -top-1/3 h-1/2 w-[150%] rotate-[-8deg] bg-gradient-to-b from-white/25 to-transparent opacity-60"
-              aria-hidden
-            />
-            <div
-              className="pointer-events-none absolute inset-0 rounded-[1.75rem] ring-1 ring-inset ring-white/20"
+              className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/70 to-transparent"
               aria-hidden
             />
 
-            <div className="relative">
-              <h2 className="text-xl font-semibold tracking-tight text-white">
-                {isSignUp ? "Create your account" : "Welcome back"}
-              </h2>
-              <p className="mt-1.5 text-sm text-white/55">
-                {isSignUp
-                  ? "Join your organization’s ESG workspace"
-                  : "Sign in to EcoSphere mission control"}
-              </p>
+            <h2 className="text-xl font-semibold tracking-tight text-white">
+              {isSignUp ? "Create your account" : "Welcome back"}
+            </h2>
+            <p className="mt-1.5 text-sm text-white/75">
+              {isSignUp
+                ? "Join your organization’s ESG workspace"
+                : "Sign in to EcoSphere mission control"}
+            </p>
 
-              <form
-                onSubmit={handleSubmit}
-                className="mt-7 flex flex-col gap-4"
-              >
-                {isSignUp && (
-                  <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="name" className="text-white/75">
-                      Full name
-                    </Label>
-                    <Input
-                      id="name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      required
-                      autoComplete="name"
-                      placeholder="Jane Smith"
-                      className={glassInput}
-                    />
-                  </div>
-                )}
+            <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-3.5">
+              {isSignUp && (
                 <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="email" className="text-white/75">
-                    Work email
+                  <Label htmlFor="name" className="text-white/85">
+                    Full name
                   </Label>
                   <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    id="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                     required
-                    autoComplete="email"
-                    placeholder="jane@company.com"
-                    className={glassInput}
+                    autoComplete="name"
+                    placeholder="Jane Smith"
+                    className="h-11 border-white/35 bg-black/35 text-white placeholder:text-white/45 backdrop-blur-md focus-visible:border-emerald-300/60 focus-visible:ring-emerald-400/30"
                   />
                 </div>
+              )}
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="email" className="text-white/85">
+                  Work email
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                  placeholder="jane@company.com"
+                  className="h-11 border-white/35 bg-black/35 text-white placeholder:text-white/45 backdrop-blur-md focus-visible:border-emerald-300/60 focus-visible:ring-emerald-400/30"
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="password" className="text-white/85">
+                  Password
+                </Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={8}
+                  autoComplete={isSignUp ? "new-password" : "current-password"}
+                  placeholder="At least 8 characters"
+                  className="h-11 border-white/35 bg-black/35 text-white placeholder:text-white/45 backdrop-blur-md focus-visible:border-emerald-300/60 focus-visible:ring-emerald-400/30"
+                />
+              </div>
+              {isSignUp && (
                 <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="password" className="text-white/75">
-                    Password
+                  <Label htmlFor="department" className="text-white/85">
+                    Department
                   </Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    minLength={8}
-                    autoComplete={
-                      isSignUp ? "new-password" : "current-password"
-                    }
-                    placeholder="At least 8 characters"
-                    className={glassInput}
-                  />
-                </div>
-                {isSignUp && (
-                  <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="department" className="text-white/75">
-                      Department
-                    </Label>
-                    <Select
-                      value={departmentId}
-                      onValueChange={setDepartmentId}
+                  <Select value={departmentId} onValueChange={setDepartmentId}>
+                    <SelectTrigger
+                      id="department"
+                      className="h-11 w-full border-white/35 bg-black/35 text-white backdrop-blur-md data-[placeholder]:text-white/45 [&_svg]:text-white/70"
                     >
-                      <SelectTrigger
-                        id="department"
-                        className={cn(glassInput, "w-full")}
-                      >
-                        <SelectValue placeholder="Select your department" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {departments.map((d) => (
-                          <SelectItem key={d.id} value={String(d.id)}>
-                            {d.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
+                      <SelectValue placeholder="Select your department" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {departments.map((d) => (
+                        <SelectItem key={d.id} value={String(d.id)}>
+                          {d.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
-                {error && (
-                  <p
-                    className="rounded-lg border border-red-400/30 bg-red-500/15 px-3 py-2 text-sm text-red-100"
-                    role="alert"
-                  >
-                    {error}
-                  </p>
-                )}
-
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  className="group relative mt-1 h-11 w-full overflow-hidden rounded-xl border border-white/20 bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/25 transition-all duration-300 hover:scale-[1.02] hover:shadow-emerald-400/40 active:scale-[0.98]"
+              {error && (
+                <p
+                  className="rounded-lg border border-red-300/40 bg-red-950/60 px-3 py-2 text-sm text-red-100"
+                  role="alert"
                 >
-                  <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-                  <span className="relative inline-flex items-center gap-2">
-                    {loading && <Loader2 className="size-4 animate-spin" />}
-                    {loading
-                      ? "Please wait..."
-                      : isSignUp
-                        ? "Create account"
-                        : "Sign in"}
-                  </span>
-                </Button>
-              </form>
+                  {error}
+                </p>
+              )}
 
-              <p className="mt-6 text-center text-sm text-white/55">
-                {isSignUp
-                  ? "Already have an account? "
-                  : "Don't have an account? "}
-                <Link
-                  href={isSignUp ? "/sign-in" : "/sign-up"}
-                  className="font-medium text-emerald-200 underline-offset-4 transition-colors hover:text-white hover:underline"
-                >
-                  {isSignUp ? "Sign in" : "Sign up"}
-                </Link>
-              </p>
-            </div>
+              <Button
+                type="submit"
+                disabled={loading}
+                className="mt-1 h-11 w-full rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 font-medium text-white shadow-lg shadow-emerald-900/40 transition hover:from-emerald-400 hover:to-teal-400 hover:shadow-emerald-500/30 active:scale-[0.99]"
+              >
+                {loading && <Loader2 className="mr-2 size-4 animate-spin" />}
+                {loading
+                  ? "Please wait..."
+                  : isSignUp
+                    ? "Create account"
+                    : "Sign in"}
+              </Button>
+            </form>
+
+            <p className="mt-6 text-center text-sm text-white/70">
+              {isSignUp ? "Already have an account? " : "Don't have an account? "}
+              <Link
+                href={isSignUp ? "/sign-in" : "/sign-up"}
+                className="font-semibold text-emerald-200 underline-offset-4 hover:text-white hover:underline"
+              >
+                {isSignUp ? "Sign in" : "Sign up"}
+              </Link>
+            </p>
           </div>
         </section>
       </div>
