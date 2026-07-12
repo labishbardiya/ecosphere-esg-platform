@@ -5,8 +5,8 @@
 | | |
 |--|--|
 | **Stack** | Next.js 16 · TypeScript · Tailwind v4 · shadcn/ui · Better Auth · Drizzle · Neon Postgres |
-| **Repo** | https://github.com/labishbardiya/ecosphere-esg-platform |
-| **Production** | https://ecosphere-esg-platform-roan.vercel.app |
+| **Repo** | [https://github.com/labishbardiya/ecosphere-esg-platform](https://github.com/manishprasad9156/ecosphere-esg-platform) |
+| **Production** | [https://ecosphere-esg-platform-roan.vercel.app](https://ecosphere-esg-platform-9o.vercel.app/) |
 
 ---
 
