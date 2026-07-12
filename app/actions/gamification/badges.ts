@@ -27,8 +27,11 @@ export async function getUserBadges() {
     .orderBy(desc(userBadges.earnedAt))
 }
 
-export async function checkAndAwardBadges() {
-  const userId = await getUserId()
+/** Award badges for any user (used by CSR approve + challenge complete). */
+export async function checkAndAwardBadgesForUser(userId: string) {
+  const { getBoolSetting } = await import("@/lib/org-settings")
+  const auto = await getBoolSetting("badge_auto_award")
+  if (!auto) return [] as string[]
 
   const userData = await db
     .select({ xpBalance: user.xpBalance })
@@ -36,7 +39,7 @@ export async function checkAndAwardBadges() {
     .where(eq(user.id, userId))
     .then((r) => r[0])
 
-  if (!userData) return
+  if (!userData) return [] as string[]
 
   const completedChallenges = await db
     .select({ count: count() })
@@ -62,18 +65,42 @@ export async function checkAndAwardBadges() {
     if (ownedBadges.includes(badge.id)) continue
 
     let qualifies = false
-    if (badge.xpThreshold && userData.xpBalance >= badge.xpThreshold) {
+    if (badge.xpThreshold != null && userData.xpBalance >= badge.xpThreshold) {
       qualifies = true
     }
-    if (badge.challengeThreshold && completedChallenges >= badge.challengeThreshold) {
+    if (
+      badge.challengeThreshold != null &&
+      completedChallenges >= badge.challengeThreshold
+    ) {
       qualifies = true
     }
 
     if (qualifies) {
       await db.insert(userBadges).values({ userId, badgeId: badge.id })
       awarded.push(badge.name)
+      try {
+        const { createNotification, isNotifyEnabled } = await import(
+          "@/lib/notifications"
+        )
+        if (await isNotifyEnabled("notify_badge_unlocks")) {
+          await createNotification({
+            userId,
+            type: "badge_unlock",
+            title: "Badge unlocked",
+            body: `You earned: ${badge.name}`,
+            href: "/gamification",
+          })
+        }
+      } catch {
+        // non-fatal
+      }
     }
   }
 
   return awarded
+}
+
+export async function checkAndAwardBadges() {
+  const userId = await getUserId()
+  return checkAndAwardBadgesForUser(userId)
 }

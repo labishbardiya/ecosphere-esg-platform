@@ -8,10 +8,13 @@ export default async function AppLayout({
 }) {
   const user = await requireUser()
 
+  // Fixed viewport shell: sidebar never scrolls away; only main content scrolls.
   return (
-    <div className="flex min-h-svh bg-background">
+    <div className="flex h-svh overflow-hidden bg-muted/40">
       <AppSidebar userName={user.name} userRole={user.role} />
-      <main className="flex-1 overflow-y-auto">{children}</main>
+      <main className="min-w-0 flex-1 overflow-y-auto">
+        <div className="min-h-full bg-background">{children}</div>
+      </main>
     </div>
   )
 }
