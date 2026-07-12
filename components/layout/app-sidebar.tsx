@@ -56,7 +56,6 @@ export function AppSidebar({
 
   return (
     <aside className="flex h-full w-60 shrink-0 flex-col border-r border-border bg-card">
-      {/* Brand */}
       <div className="flex h-14 shrink-0 items-center gap-2.5 border-b border-border px-4">
         <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
           <Leaf className="size-4" aria-hidden="true" />
@@ -65,11 +64,12 @@ export function AppSidebar({
           <p className="truncate text-sm font-semibold leading-tight text-foreground">
             EcoSphere
           </p>
-          <p className="truncate text-[11px] text-muted-foreground">ESG Platform</p>
+          <p className="truncate text-[11px] text-muted-foreground">
+            ESG Platform
+          </p>
         </div>
       </div>
 
-      {/* Nav — scrolls only if needed; never pushes footer off-screen awkwardly */}
       <nav
         className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto p-3"
         aria-label="Main"
@@ -84,6 +84,7 @@ export function AppSidebar({
             <Link
               key={item.href}
               href={item.href}
+              prefetch
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                 active
@@ -98,7 +99,6 @@ export function AppSidebar({
         })}
       </nav>
 
-      {/* User block — always pinned to bottom of the shell */}
       <div className="shrink-0 border-t border-border bg-muted/30 p-3">
         <div className="mb-2 flex items-center gap-2.5 rounded-lg px-1">
           <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary">

@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 export function AnimatedNumber({
   value,
   decimals = 0,
-  duration = 900,
+  duration = 450,
   className,
   prefix = "",
   suffix = "",
