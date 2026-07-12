@@ -1,6 +1,9 @@
 import { requireUser } from "@/lib/session"
 import { AppSidebar } from "@/components/layout/app-sidebar"
 
+// Auth-gated shell must never be statically prerendered at build time.
+export const dynamic = "force-dynamic"
+
 export default async function AppLayout({
   children,
 }: {

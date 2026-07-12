@@ -8,17 +8,22 @@ import { auth, type SessionUser } from "@/lib/auth"
  * Returns the current session user or null.
  */
 export async function getSessionUser(): Promise<SessionUser | null> {
-  const session = await auth.api.getSession({ headers: await headers() })
-  if (!session?.user) return null
-  const u = session.user as unknown as SessionUser
-  return {
-    id: u.id,
-    name: u.name,
-    email: u.email,
-    role: u.role ?? "employee",
-    departmentId: u.departmentId ?? null,
-    xpBalance: u.xpBalance ?? 0,
-    pointsBalance: u.pointsBalance ?? 0,
+  try {
+    const session = await auth.api.getSession({ headers: await headers() })
+    if (!session?.user) return null
+    const u = session.user as unknown as SessionUser
+    return {
+      id: u.id,
+      name: u.name,
+      email: u.email,
+      role: u.role ?? "employee",
+      departmentId: u.departmentId ?? null,
+      xpBalance: u.xpBalance ?? 0,
+      pointsBalance: u.pointsBalance ?? 0,
+    }
+  } catch {
+    // DB/auth outage must not white-screen public pages
+    return null
   }
 }
 

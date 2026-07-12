@@ -6,6 +6,8 @@ import { Leaf, ArrowRight, Sparkles, CheckCircle2 } from "lucide-react"
 import { LandingStats } from "@/components/landing/landing-stats"
 import { LandingModules } from "@/components/landing/landing-modules"
 
+export const dynamic = "force-dynamic"
+
 export default async function HomePage() {
   const user = await getSessionUser()
   if (user) redirect("/dashboard")
