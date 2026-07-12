@@ -52,6 +52,22 @@ export const auth = betterAuth({
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // 1 day
   },
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          // Bootstrap: the first registered user becomes the org admin.
+          const { rows } = await pool.query(
+            'SELECT COUNT(*)::int AS count FROM "user"',
+          )
+          const isFirstUser = rows[0]?.count === 0
+          return {
+            data: { ...user, role: isFirstUser ? "admin" : "employee" },
+          }
+        },
+      },
+    },
+  },
   ...(process.env.NODE_ENV === "development"
     ? {
         advanced: {
